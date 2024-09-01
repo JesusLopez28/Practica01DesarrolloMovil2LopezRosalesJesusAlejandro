@@ -2,9 +2,11 @@ package com.example.practica01desarrollomovil2lopezrosalesjesusalejandro
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -18,6 +20,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.util.Calendar
 
 class CheckoutActivity : AppCompatActivity() {
 
@@ -54,6 +57,7 @@ class CheckoutActivity : AppCompatActivity() {
             Toast.makeText(this, "Compra finalizada!", Toast.LENGTH_SHORT).show()
             cart.clearCart()
             sendPurchaseNotification()
+            setPurchaseAlarm(totalAmount)
             startActivity(Intent(this, HomeActivity::class.java))
             finish()
         }
@@ -111,5 +115,24 @@ class CheckoutActivity : AppCompatActivity() {
             }
             notify(1002, notification)
         }
+    }
+
+    private fun setPurchaseAlarm(totalAmount: Double) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, InformativeActivity::class.java).apply {
+            putExtra("TOTAL_AMOUNT", totalAmount)
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val triggerTime = Calendar.getInstance().apply {
+            add(Calendar.SECOND, 10)
+        }.timeInMillis
+
+        alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
     }
 }

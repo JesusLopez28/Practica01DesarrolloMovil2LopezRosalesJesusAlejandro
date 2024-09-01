@@ -98,20 +98,38 @@ class ProductDetailActivity : AppCompatActivity() {
 
     @SuppressLint("MissingPermission")
     private fun sendCartNotification(product: Product) {
-        val intent = Intent(this, CheckoutActivity::class.java)
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(
+        val checkoutIntent = Intent(this, CheckoutActivity::class.java)
+        val checkoutPendingIntent: PendingIntent = PendingIntent.getActivity(
             this,
             0,
-            intent,
+            checkoutIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val yesIntent = Intent(this, CheckoutActivity::class.java)
+        val yesPendingIntent: PendingIntent = PendingIntent.getActivity(
+            this,
+            1,
+            yesIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val noIntent = Intent(this, HomeActivity::class.java)
+        val noPendingIntent: PendingIntent = PendingIntent.getActivity(
+            this,
+            2,
+            noIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val notification = NotificationCompat.Builder(this, "cart_channel")
-            .setSmallIcon(R.drawable.ic_cart)  // Cambia por el icono de tu notificación
+            .setSmallIcon(R.drawable.ic_cart)
             .setContentTitle("Producto agregado al carrito")
             .setContentText("¿Desea ir a finalizar su compra?")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentIntent(pendingIntent)
+            .setContentIntent(checkoutPendingIntent)
+            .addAction(R.drawable.ic_check, "Sí", yesPendingIntent)
+            .addAction(R.drawable.ic_close, "No", noPendingIntent)
             .setAutoCancel(true)
             .build()
 
@@ -131,4 +149,5 @@ class ProductDetailActivity : AppCompatActivity() {
             notify(1001, notification)
         }
     }
+
 }
